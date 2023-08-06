@@ -9,8 +9,10 @@ from telebot.types import Message
 BAD_REQUEST = "Я не понимаю😢"
 
 
-def text_answer(message: Message, bot: TeleBot):
+def bad_request(message: Message, bot: TeleBot):
     """
-    You can create a function and use parameter pass_bot.
+    This function answer on any requests, that weren't accepted
+    by other functions
     """
+    print(message.text)
     bot.send_message(message.chat.id, BAD_REQUEST)
