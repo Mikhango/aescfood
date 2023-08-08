@@ -14,7 +14,6 @@ class DataBase:
 
     def __init__(self, file : str, namedb : str) -> None:
         self.namedb = self.__getway(file, namedb) + ".db"
-        self.nametable = ""
 
     def __getway(self, file : str, namedb : str) -> str:
         return os.path.join(os.path.split(os.path.abspath(file))[0], namedb)
@@ -25,25 +24,14 @@ class DataBase:
 
         return self.namedb
 
-    def setnametable(self, nametable : str) -> None:
-        """This function sets new name of table"""
-
-        with sqconnect(self.namedb) as con:
-            cur = con.cursor()
-            info = cur.execute(f"""SELECT name FROM sqlite_master WHERE type='table' \
-                               AND name='{nametable}'""")
-            if info.fetchone() is None:
-                raise ValueError(f"Table {nametable} is not exists")
-        self.nametable = nametable
-
-    def checkparam(self, paramvalue, paramname : str) -> bool:
+    def checkuser(self, userid : int) -> bool:
         # You need to put paramvalue to func in type it should be
         """This function checks does param with some paramname is exists"""
 
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
-            info = cur.execute(f"""SELECT * FROM {self.nametable} WHERE {paramname}=?""", \
-                               (paramvalue, ))
+            info = cur.execute("""SELECT * FROM users WHERE id=?""", \
+                               (userid, ))
             if info.fetchone() is None:
                 return False
         return True
@@ -51,64 +39,53 @@ class DataBase:
     def createtable(self, nametable : str, params : list) -> None:
         """This function creates table if table is not exists"""
 
-        self.nametable = nametable
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
             allparams = ''
             for param in params:
                 allparams += f"{param[0]} {param[1].upper()}, "
-            cur.execute(f"""CREATE TABLE IF NOT EXISTS {self.nametable}({allparams[:-2]});""")
+            cur.execute(f"""CREATE TABLE IF NOT EXISTS {nametable}({allparams[:-2]});""")
             con.commit()
 
-    def adddata(self, params : list, paramvalue, paramname : str) -> None:
-        """This function add given data to current table"""
+    def adduser(self, params : list, userid : int) -> None:
+        """This function add given user to current table"""
 
-        if self.checkparam(paramvalue, paramname):
+        if self.checkuser(userid):
             raise ValueError("This data is also exists")
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
             cnt = len(params)
             cort = tuple(params)
-            cur.execute(f"""INSERT INTO {self.nametable} VALUES({("?, " * cnt)[:-2]});""", cort)
+            cur.execute(f"""INSERT INTO users VALUES({("?, " * cnt)[:-2]});""", cort)
             con.commit()
 
-    def deldata(self, paramvalue, paramname : str) -> None: # deleting only using param
-        """This function delete data with given param from current table"""
+    def deluser(self, userid : int) -> None: # deleting only using param
+        """This function delete user with given id"""
 
-        if not self.checkparam(paramvalue, paramname):
+        if not self.checkuser(userid):
             raise ValueError("This data is not exists")
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
-            cur.execute(f"""DELETE FROM {self.nametable} WHERE {paramname}=?;""", (paramvalue,))
+            cur.execute("""DELETE FROM users WHERE id=?;""", (userid,))
             con.commit()
 
-    def editdata(self, parbyvalue, parbyname : str, updvalue, updname : str) -> None:
-        """This function edit given data with given param in current table"""
+    def edituser(self, editname : str, editval, userid : int) -> None:
+        """This function edit user param by user id"""
 
-        if not self.checkparam(parbyvalue, parbyname):
+        if not self.checkuser(userid):
             raise ValueError("This data is not exists")
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
-            cur.execute(f"""UPDATE {self.nametable} set {updname}=? where {parbyname}=?""", \
-                        (updvalue, parbyvalue))
+            cur.execute(f"""UPDATE users set {editname}=? where id=?""", \
+                        (editval, userid))
             con.commit()
 
-    def getone(self, parvalue, parname : str) -> tuple:
-        """This function gets one row of data with given param"""
+    def getuser(self, userid : int):
+        """This function gets one user with given id"""
 
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
-            info = cur.execute(f"""SELECT * FROM {self.nametable} WHERE {parname}=?""", \
-                               (parvalue, ))
+            info = cur.execute("""SELECT * FROM users WHERE id=?""", \
+                               (userid, ))
             return info.fetchone()
-        return None
-
-    def getall(self, parvalue, parname : str) -> list:
-        """This function gets all rows of data with given param"""
-
-        with sqconnect(self.namedb) as con:
-            cur = con.cursor()
-            info = cur.execute(f"""SELECT * FROM {self.nametable} WHERE {parname}=?""", \
-                                (parvalue, ))
-            return info.fetchall()
         return None
