@@ -20,7 +20,7 @@ def myprofile(message : Message, bot : TeleBot, users, ansmsg):
 
     bot.send_message(message.chat.id, ansmsg['answers']['PROFILE'].format(
         nick=message.from_user.first_name, number=user[2], room=user[3]),
-                     reply_markup=ansmsg['markups']['PROFILEMARKUP'], parse_mode= 'Markdown')
+                     reply_markup=ansmsg['markups']['PROFILEMARKUP'], parse_mode='Markdown')
 
 def changenumber(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg, checkers):
     """This function allows user to change his number"""
