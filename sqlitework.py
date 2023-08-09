@@ -25,7 +25,6 @@ class DataBase:
         return self.namedb
 
     def checkuser(self, userid : int) -> bool:
-        # You need to put paramvalue to func in type it should be
         """This function checks does param with some paramname is exists"""
 
         with sqconnect(self.namedb) as con:
@@ -47,8 +46,10 @@ class DataBase:
             cur.execute(f"""CREATE TABLE IF NOT EXISTS {nametable}({allparams[:-2]});""")
             con.commit()
 
-    def adduser(self, params : list, userid : int) -> None:
+    def adduser(self, params : list) -> None:
         """This function add given user to current table"""
+
+        userid = params[0]
 
         if self.checkuser(userid):
             raise ValueError("This data is also exists")
@@ -80,7 +81,7 @@ class DataBase:
                         (editval, userid))
             con.commit()
 
-    def getuser(self, userid : int):
+    def getuser(self, userid : int) -> None:
         """This function gets one user with given id"""
 
         with sqconnect(self.namedb) as con:

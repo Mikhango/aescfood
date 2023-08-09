@@ -10,7 +10,7 @@ class BotMiddleware(BaseMiddleware):
 
     def __init__(self, users, ansmsg):
         self.update_sensitive = True
-        self.update_types = ['message']
+        self.update_types = ['message', 'callback_query']
         self.users = users
         self.ansmsg = ansmsg
 
@@ -32,5 +32,16 @@ class BotMiddleware(BaseMiddleware):
 
     def post_process_message(self, message, data, exception=None):
         '''Post process method for msg'''
+
+        pass
+
+    def pre_process_callback_query(self, callback_query, data):
+        '''Gives dict of answers to handlers'''
+
+        data['users'] = self.users
+        data['ansmsg'] = self.ansmsg
+
+    def post_process_callback_query(self, callback_query, data, exception=None):
+        '''Post process method for callback'''
 
         pass

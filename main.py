@@ -12,7 +12,7 @@ from sqlitework import DataBase
 from bot.config import TOKEN
 
 # Register handlers
-from bot.register_handlers import register_handlers
+from bot.register_handlers import register_handlers, register_callback_handlers
 
 # Middleware class
 from bot.middlewares.middlewareclasses import BotMiddleware
@@ -26,9 +26,10 @@ bot = TeleBot(TOKEN, use_class_middlewares=True)
 users = DataBase(__file__, "users")
 users.createtable("users", [["id", "INT"], ["status", "INT"],
                     ["number", "TEXT"], ["room", "TEXT"], ["earned", "INT"]])
-users.createtable("orders", [["id", "INT"], ["room", "TEXT"], ["price", "INT"]])
+# users.createtable("orders", [["id", "INT"], ["room", "TEXT"], ["price", "INT"]])
 
 register_handlers(bot=bot, users=users)
+register_callback_handlers(bot=bot)
 
 bot.setup_middleware(BotMiddleware(users, ansmsg))
 
