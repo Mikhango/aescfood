@@ -6,7 +6,7 @@ from telebot import TeleBot
 from telebot.types import Message
 
 
-def start(message : Message, bot : TeleBot, users, ansmsg):
+def start(message : Message, bot : TeleBot, users, ansmsg, checkers):
     """This function answer on a /start command"""
 
     try:
@@ -19,13 +19,13 @@ def start(message : Message, bot : TeleBot, users, ansmsg):
     bot.send_message(message.chat.id, ansmsg['answers']['STARTMSG'])
     bot.send_message(message.chat.id, ansmsg['answers']['TELEPHONE'])
     bot.register_next_step_handler(message=message, callback=getnumber, bot=bot, users=users,
-                                   ansmsg = ansmsg)
+                                   ansmsg = ansmsg, checkers=checkers)
 
-def getnumber(message : Message, bot : TeleBot, users, ansmsg):
+def getnumber(message : Message, bot : TeleBot, users, ansmsg, checkers):
     """This function gets number of user"""
 
     try:
-        if not message.text.isdigit():
+        if not checkers.checknum(message.text):
             bot.send_message(message.chat.id, ansmsg['answers']['PHONEWRONG'])
             bot.register_next_step_handler(message=message, callback=getnumber, bot=bot,
                                            users=users, ansmsg=ansmsg)

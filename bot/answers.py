@@ -15,7 +15,7 @@ ROOM = "Отлично! Теперь отправь мне номер в ком�
 ENDREG = "Вы успешно зарегистрировались!"
 PROFILE = "*Твой профиль*\n\n*Никнейм:*  {nick}\n*Номер:*  \
 {number}\n*Номер комнаты:*  {room}"
-EDITNUMBER = "Введи новый номер телефона"
+EDITNUMBER = "Введи новый номер телефона в формате 8XXXXXXXXXX"
 EDITROOM = "Введи новый номер комнаты"
 PROFILEEDITED = "Ваш профиль успешно изменен"
 
@@ -44,7 +44,7 @@ EDIT_NUMBER = InlineKeyboardButton(CHANGENUMBERBTN, callback_data=CALLBACKNUMBER
 BASEMARKUP = ReplyKeyboardMarkup(resize_keyboard=True)
 BASEMARKUP.add(MY_PROFILE)
 
-PROFILEMARKUP = InlineKeyboardMarkup(row_width=2)
+PROFILEMARKUP = InlineKeyboardMarkup(row_width=1)
 PROFILEMARKUP.add(EDIT_ROOM, EDIT_NUMBER)
 
 

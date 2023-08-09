@@ -22,14 +22,14 @@ def myprofile(message : Message, bot : TeleBot, users, ansmsg):
         nick=message.from_user.first_name, number=user[2], room=user[3]),
                      reply_markup=ansmsg['markups']['PROFILEMARKUP'], parse_mode= 'Markdown')
 
-def changenumber(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg):
+def changenumber(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg, checkers):
     """This function allows user to change his number"""
 
     bot.edit_message_text(ansmsg['answers']['EDITNUMBER'],
                           callback_data.from_user.id, callback_data.message.message_id,
                           reply_markup=ansmsg['markups']['EMPTYINL'])
     bot.register_next_step_handler(callback_data.message, enternumber, bot=bot,
-                                   users=users, ansmsg=ansmsg)
+                                   users=users, ansmsg=ansmsg, checkers=checkers)
 
 def changeroom(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg):
     """This function allows user to change his room number"""
@@ -52,10 +52,10 @@ def enterroom(message : Message, bot : TeleBot, users, ansmsg):
     bot.send_message(message.chat.id, ansmsg['answers']['PROFILEEDITED'],
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
 
-def enternumber(message : Message, bot : TeleBot, users, ansmsg):
+def enternumber(message : Message, bot : TeleBot, users, ansmsg, checkers):
     """This function edits user number"""
 
-    if not message.text.isdigit():
+    if not checkers.checknum(message.text):
         bot.send_message(message.chat.id, ansmsg['answers']['PHONEWRONG'],
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
         return
