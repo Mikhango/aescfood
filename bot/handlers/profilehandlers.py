@@ -43,7 +43,7 @@ def changeroom(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg, check
 def enterroom(message : Message, bot : TeleBot, users, ansmsg, checkers):
     """This function edits user room"""
 
-    if not checkers.checknum(message.text):
+    if not checkers.checkroom(message.text):
         bot.send_message(message.chat.id, ansmsg['answers']['ROOMWRONG'],
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
         return
