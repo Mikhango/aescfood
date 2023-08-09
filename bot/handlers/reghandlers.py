@@ -24,12 +24,13 @@ def start(message : Message, bot : TeleBot, users, ansmsg, checkers):
 def getnumber(message : Message, bot : TeleBot, users, ansmsg, checkers):
     """This function gets number of user"""
 
+    if not checkers.checknum(message.text):
+        bot.send_message(message.chat.id, ansmsg['answers']['PHONEWRONG'])
+        bot.register_next_step_handler(message=message, callback=getnumber, bot=bot,
+                                        users=users, ansmsg=ansmsg, checkers=checkers)
+        return
+
     try:
-        if not checkers.checknum(message.text):
-            bot.send_message(message.chat.id, ansmsg['answers']['PHONEWRONG'])
-            bot.register_next_step_handler(message=message, callback=getnumber, bot=bot,
-                                           users=users, ansmsg=ansmsg)
-            return
         users.edituser("number", int(message.text), message.chat.id)
     except ValueError:
         bot.send_message(message.chat.id, ansmsg['answers']['BADREQUESTREG'])
@@ -37,10 +38,16 @@ def getnumber(message : Message, bot : TeleBot, users, ansmsg, checkers):
 
     bot.send_message(message.chat.id, ansmsg['answers']['ROOM'])
     bot.register_next_step_handler(message=message, callback=getroom, bot=bot, users=users,
-                                   ansmsg=ansmsg)
+                                   ansmsg=ansmsg, checkers=checkers)
 
-def getroom(message : Message, bot : TeleBot, users, ansmsg):
+def getroom(message : Message, bot : TeleBot, users, ansmsg, checkers):
     """This function gets user's room number"""
+
+    if not checkers.checkroom(message.text):
+        bot.send_message(message.chat.id, ansmsg['answers']['ROOMWRONG'])
+        bot.register_next_step_handler(message=message, callback=getroom, bot=bot,
+                                        users=users, ansmsg=ansmsg, checkers=checkers)
+        return
 
     try:
         users.edituser("room", message.text, message.chat.id)

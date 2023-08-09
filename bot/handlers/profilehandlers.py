@@ -31,17 +31,22 @@ def changenumber(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg, che
     bot.register_next_step_handler(callback_data.message, enternumber, bot=bot,
                                    users=users, ansmsg=ansmsg, checkers=checkers)
 
-def changeroom(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg):
+def changeroom(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg, checkers):
     """This function allows user to change his room number"""
 
     bot.edit_message_text(ansmsg['answers']['EDITROOM'],
                           callback_data.from_user.id, callback_data.message.message_id,
                           reply_markup=ansmsg['markups']['EMPTYINL'])
     bot.register_next_step_handler(callback_data.message, enterroom, bot=bot,
-                                   users=users, ansmsg=ansmsg)
+                                   users=users, ansmsg=ansmsg, checkers=checkers)
 
-def enterroom(message : Message, bot : TeleBot, users, ansmsg):
+def enterroom(message : Message, bot : TeleBot, users, ansmsg, checkers):
     """This function edits user room"""
+
+    if not checkers.checknum(message.text):
+        bot.send_message(message.chat.id, ansmsg['answers']['ROOMWRONG'],
+                     reply_markup=ansmsg['markups']['BASEMARKUP'])
+        return
 
     try:
         users.edituser("room", message.text, message.chat.id)

@@ -23,6 +23,7 @@ BADREQUESTREG = "Ты уже зарегистрирован(-а)!"
 DOESNTREG = "Ты еще не зарегистрирован(-а)! Напиши мне /start, чтобы это исправить;)"
 BADREQUEST = "Я не понимаю😢"
 PHONEWRONG = "Неправильный формат ввода!"
+ROOMWRONG = "Неправильный формат ввода!"
 
 # Callbacks
 CALLBACKNUMBER = 'changenumber'
@@ -31,6 +32,8 @@ CALLBACKROOM = 'changeroom'
 # Buttons
 
 PROFILEBTN = "Мой профиль"
+
+
 CHANGEROOMBTN = "Изменить комнату"
 CHANGENUMBERBTN = "Изменить номер"
 
@@ -66,6 +69,7 @@ answers = {
     "BADREQUESTREG" : BADREQUESTREG,
     "DOESNTREG" : DOESNTREG,
     "PHONEWRONG" : PHONEWRONG,
+    "ROOMWRONG" : ROOMWRONG,
 }
 
 markups = {

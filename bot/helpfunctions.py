@@ -13,3 +13,8 @@ class Checkers:
         if number.isdigit() and len(number) == 11:
             return True
         return False
+
+    def checkroom(self, room : str):
+        """This function checks number of room"""
+
+        return True
