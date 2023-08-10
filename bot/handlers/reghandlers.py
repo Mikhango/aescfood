@@ -10,7 +10,7 @@ def start(message : Message, bot : TeleBot, users, ansmsg, checkers):
     """This function answer on a /start command"""
 
     try:
-        users.adduser([message.chat.id, -1, "", "", 0])
+        users.adduser(message.chat.id)
     except ValueError:
         bot.send_message(message.chat.id, ansmsg['answers']['BADREQUESTREG'],
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
@@ -31,7 +31,7 @@ def getnumber(message : Message, bot : TeleBot, users, ansmsg, checkers):
         return
 
     try:
-        users.edituser("number", int(message.text), message.chat.id)
+        users.editusernumber(message.chat.id, message.text)
     except ValueError:
         bot.send_message(message.chat.id, ansmsg['answers']['BADREQUESTREG'])
         return
@@ -50,7 +50,7 @@ def getroom(message : Message, bot : TeleBot, users, ansmsg, checkers):
         return
 
     try:
-        users.edituser("room", message.text, message.chat.id)
+        users.edituserroom(message.chat.id, message.text)
     except ValueError:
         bot.send_message(message.chat.id, ansmsg['answers']['BADREQUESTREG'])
         return

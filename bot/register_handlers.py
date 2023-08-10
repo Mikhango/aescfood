@@ -10,7 +10,8 @@ from bot.handlers.registercheck import checkreg
 from bot.handlers.reghandlers import start
 from bot.handlers.texthandler import bad_request
 from bot.handlers.profilehandlers import myprofile, changenumber, changeroom
-from bot.handlers.careerhandlers import couriermain, regcourier, editcourierstatus
+from bot.handlers.careerhandlers import couriermain, regcourier, editcourierstatus, \
+getcourierprice
 
 def register_handlers(bot : TeleBot, users):
     """This function register all handlers in necessary order"""
@@ -37,4 +38,7 @@ def register_callback_handlers(bot : TeleBot):
                                         pass_bot=True)
     bot.register_callback_query_handler(callback=editcourierstatus,
                                         func=lambda c: c.data == callbacks["CALLBACKCOURIERCHST"],
+                                        pass_bot=True)
+    bot.register_callback_query_handler(callback=getcourierprice,
+                                        func=lambda c: c.data == callbacks["CALLBACKCOURIERPRICE"],
                                         pass_bot=True)

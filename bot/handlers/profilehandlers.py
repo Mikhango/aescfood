@@ -19,7 +19,7 @@ def myprofile(message : Message, bot : TeleBot, users, ansmsg):
         return
 
     bot.send_message(message.chat.id, ansmsg['answers']['PROFILE'].format(
-        nick=message.from_user.first_name, number=user[2], room=user[3]),
+        nick=message.from_user.first_name, number=user[1], room=user[2]),
                      reply_markup=ansmsg['markups']['PROFILEMARKUP'], parse_mode='Markdown')
 
 def changenumber(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg, checkers):
@@ -48,14 +48,20 @@ def enterroom(message : Message, bot : TeleBot, users, ansmsg, checkers):
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
         return
 
+    user = ()
+
     try:
-        users.edituser("room", message.text, message.chat.id)
+        users.edituserroom(message.chat.id, message.text)
+        user = users.getuser(message.chat.id)
     except ValueError:
         bot.send_message(message.chat.id, ansmsg['answers']['BADREQUEST'],
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
         return
     bot.send_message(message.chat.id, ansmsg['answers']['PROFILEEDITED'],
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
+    bot.send_message(message.chat.id, ansmsg['answers']['PROFILE'].format(
+                    nick=message.from_user.first_name, number=user[1], room=user[2]),
+                     reply_markup=ansmsg['markups']['PROFILEMARKUP'], parse_mode='Markdown')
 
 def enternumber(message : Message, bot : TeleBot, users, ansmsg, checkers):
     """This function edits user number"""
@@ -65,11 +71,17 @@ def enternumber(message : Message, bot : TeleBot, users, ansmsg, checkers):
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
         return
 
+    user = ()
+
     try:
-        users.edituser("number", message.text, message.chat.id)
+        users.editusernumber(message.chat.id, message.text)
+        user = users.getuser(message.chat.id)
     except ValueError:
         bot.send_message(message.chat.id, ansmsg['answers']['BADREQUEST'],
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
         return
     bot.send_message(message.chat.id, ansmsg['answers']['PROFILEEDITED'],
                      reply_markup=ansmsg['markups']['BASEMARKUP'])
+    bot.send_message(message.chat.id, ansmsg['answers']['PROFILE'].format(
+                    nick=message.from_user.first_name, number=user[1], room=user[2]),
+                     reply_markup=ansmsg['markups']['PROFILEMARKUP'], parse_mode='Markdown')

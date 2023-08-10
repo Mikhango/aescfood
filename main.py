@@ -27,9 +27,12 @@ from bot.helpfunctions import Checkers
 bot = TeleBot(TOKEN, use_class_middlewares=True)
 
 users = DataBase(__file__, "users")
-users.createtable("users", [["id", "INT"], ["status", "INT"],
-                    ["number", "TEXT"], ["room", "TEXT"], ["earned", "INT"]])
-# users.createtable("orders", [["id", "INT"], ["room", "TEXT"], ["price", "INT"]])
+users.createtable("users", [["id", "INT"], ["number", "TEXT"], ["room", "TEXT"]])
+users.createtable("couriers", [["id", "INT"], ["status", "INT"],
+                    ["price", "INT"], ["earned", "INT"]])
+users.createtable("orders", [["id", "INT"], ["id_client", "INT"], ["name_client", "TEXT"],
+                  ["id_courier", "INT"], ["name_courier", "TEXT"],
+                  ["room", "TEXT"], ["price", "INT"], ["comment", "TEXT"]])
 
 register_handlers(bot=bot, users=users)
 register_callback_handlers(bot=bot)

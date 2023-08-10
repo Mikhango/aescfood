@@ -25,7 +25,7 @@ class DataBase:
         return self.namedb
 
     def checkuser(self, userid : int) -> bool:
-        """This function checks does param with some paramname is exists"""
+        """This function checks is user exists"""
 
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
@@ -46,10 +46,10 @@ class DataBase:
             cur.execute(f"""CREATE TABLE IF NOT EXISTS {nametable}({allparams[:-2]});""")
             con.commit()
 
-    def adduser(self, params : list) -> None:
+    def adduser(self, userid : int) -> None:
         """This function add given user to current table"""
 
-        userid = params[0]
+        params = [userid, "", ""]
 
         if self.checkuser(userid):
             raise ValueError("This data is also exists")
@@ -70,18 +70,29 @@ class DataBase:
             cur.execute("""DELETE FROM users WHERE id=?;""", (userid,))
             con.commit()
 
-    def edituser(self, editname : str, editval, userid : int) -> None:
-        """This function edit user param by user id"""
+    def editusernumber(self, userid : int, newnumber : str) -> None:
+        """This function edit user number"""
 
         if not self.checkuser(userid):
             raise ValueError("This data is not exists")
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
-            cur.execute(f"""UPDATE users set {editname}=? where id=?""", \
-                        (editval, userid))
+            cur.execute("""UPDATE users set number=? where id=?""", \
+                        (newnumber, userid))
             con.commit()
 
-    def getuser(self, userid : int) -> None:
+    def edituserroom(self, userid : int, newroom : str) -> None:
+        """This function edit user room"""
+
+        if not self.checkuser(userid):
+            raise ValueError("This data is not exists")
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            cur.execute("""UPDATE users set room=? where id=?""", \
+                        (newroom, userid))
+            con.commit()
+
+    def getuser(self, userid : int) -> tuple:
         """This function gets one user with given id"""
 
         with sqconnect(self.namedb) as con:
@@ -89,4 +100,75 @@ class DataBase:
             info = cur.execute("""SELECT * FROM users WHERE id=?""", \
                                (userid, ))
             return info.fetchone()
-        return None
+
+    def checkcourier(self, userid : int) -> bool:
+        """This function checks is courier exists"""
+
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            info = cur.execute("""SELECT * FROM couriers WHERE id=?""", \
+                               (userid, ))
+            if info.fetchone() is None:
+                return False
+        return True
+
+    def getcourier(self, userid : int) -> tuple:
+        """This function gets one user with given id"""
+
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            info = cur.execute("""SELECT * FROM couriers WHERE id=?""", \
+                               (userid, ))
+            return info.fetchone()
+
+    def addcourier(self, userid : int) -> None:
+        """This function add given courier to current table"""
+
+        params = [userid, 0, 0, 0]
+
+        if self.checkcourier(userid):
+            raise ValueError("This data is also exists")
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            cnt = len(params)
+            cort = tuple(params)
+            cur.execute(f"""INSERT INTO couriers VALUES({("?, " * cnt)[:-2]});""", cort)
+            con.commit()
+
+    def changecourierstatus(self, userid : int) -> None:
+        """This function edit courier status"""
+
+        if not self.checkuser(userid):
+            raise ValueError("This data is not exists")
+
+        newstat = int(not self.getcourier(userid)[1])
+
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            cur.execute("""UPDATE couriers set status=? where id=?""", \
+                        (newstat, userid))
+            con.commit()
+
+    def editcourierprice(self, userid : int, newprice : int) -> None:
+        """This function edit courier minimal price"""
+
+        if not self.checkuser(userid):
+            raise ValueError("This data is not exists")
+
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            cur.execute("""UPDATE couriers set price=? where id=?""", \
+                        (newprice, userid))
+            con.commit()
+
+    def editcouriermoney(self, userid : int, money : int) -> None:
+        """This function edit courier minimal price"""
+
+        if not self.checkuser(userid):
+            raise ValueError("This data is not exists")
+
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            cur.execute("""UPDATE couriers set earned=? where id=?""", \
+                        (money, userid))
+            con.commit()

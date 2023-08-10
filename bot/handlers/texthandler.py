@@ -6,7 +6,7 @@ from telebot import TeleBot
 from telebot.types import Message
 
 
-def bad_request(message: Message, bot: TeleBot, users, ansmsg):
+def bad_request(message: Message, bot: TeleBot, ansmsg):
     """
     This function answer on any requests, that weren't accepted
     by other functions

@@ -18,3 +18,10 @@ class Checkers:
         """This function checks number of room"""
 
         return True
+
+    def checkprice(self, price : int):
+        """This function checks price of order"""
+
+        if price >= 0 and price < 10000:
+            return True
+        return False
