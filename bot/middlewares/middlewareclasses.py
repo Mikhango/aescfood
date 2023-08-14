@@ -8,13 +8,14 @@ from telebot import BaseMiddleware
 class BotMiddleware(BaseMiddleware):
     '''Class for messages middlewares'''
 
-    def __init__(self, users, answers, markups, helpers, states):
+    def __init__(self, users, answers, markups, callbacks, helpers, states):
         self.update_sensitive = True
         self.update_types = ['message', 'callback_query']
         self.users = users
         self.answers = answers
         self.markups = markups
         self.helpers = helpers
+        self.callbacks = callbacks
         self.states = states
 
     def pre_process(self, message, data):
@@ -34,6 +35,7 @@ class BotMiddleware(BaseMiddleware):
         data['helpers'] = self.helpers
         data['states'] = self.states
         data['answers'] = self.answers
+        data['callbacks'] = self.callbacks
         data['markups'] = self.markups
 
     def post_process_message(self, message, data, exception=None):
@@ -48,6 +50,7 @@ class BotMiddleware(BaseMiddleware):
         data['helpers'] = self.helpers
         data['states'] = self.states
         data['answers'] = self.answers
+        data['callbacks'] = self.callbacks
         data['markups'] = self.markups
 
     def post_process_callback_query(self, callback_query, data, exception=None):

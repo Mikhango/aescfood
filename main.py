@@ -22,7 +22,7 @@ from bot.register_handlers import register_handlers, register_callback_handlers
 from bot.middlewares.middlewareclasses import BotMiddleware
 
 # Answers
-from bot.answers import Answers, Markups
+from bot.answers import Answers, Markups, Callbacks
 
 # Helpfunctions
 from bot.filters.filters import Helpers
@@ -53,7 +53,7 @@ states = States()
 register_handlers(bot=bot, users=users, helpers=helpers, states=states)
 register_callback_handlers(bot=bot)
 
-bot.setup_middleware(BotMiddleware(users, Answers(), Markups(), helpers, states))
+bot.setup_middleware(BotMiddleware(users, Answers(), Markups(), Callbacks(), helpers, states))
 
 if __name__ == '__main__':
     bot.polling(none_stop = True, interval = 0)

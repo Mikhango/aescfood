@@ -123,6 +123,15 @@ class DataBase:
                                (userid, ))
             return info.fetchone()
 
+    def getfreecouriers(self):
+        """This function gets one user with given id"""
+
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            info = cur.execute("""SELECT * FROM couriers WHERE status=?""", \
+                               (1, ))
+            return info.fetchall()
+
     def addcourier(self, userid : int) -> None:
         """This function add given courier to current table"""
 
@@ -231,6 +240,8 @@ class DataBase:
             cort = tuple(params)
             cur.execute(f"""INSERT INTO orders VALUES({("?, " * cnt)[:-2]});""", cort)
             con.commit()
+
+        return id_order
 
     def addordercourier(self, orderid : int, courier_id : int, courier_name : str):
         """This functions add courier to order"""

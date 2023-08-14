@@ -9,8 +9,12 @@ from telebot.types import Message
 class Register:
     """Class with register handlers"""
 
-    def start(self, message : Message, bot : TeleBot, answers, states):
+    def start(self, message : Message, bot : TeleBot, answers, states, users):
         """This function answer on a /start command"""
+
+        if users.getuser(message.chat.id) is not None:
+            bot.send_message(message.chat.id, answers.BADREQUESTREG)
+            return
 
         bot.send_message(message.chat.id, answers.STARTMSG)
         bot.send_message(message.chat.id, answers.TELEPHONE)

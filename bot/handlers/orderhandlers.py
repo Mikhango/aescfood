@@ -3,17 +3,21 @@ This file contain functions that
 """
 
 from telebot import TeleBot
-from telebot.types import Message, CallbackQuery
+from telebot.types import Message, CallbackQuery, \
+InlineKeyboardButton, InlineKeyboardMarkup
+from telebot.apihelper import ApiTelegramException
 
-def form_order(answers, userid : int, courier : str, room : str, \
+def form_order(answers, userid : int, courier : str, number : str, room : str, \
               price : int, comment : str):
     """This function formats order message"""
 
     if courier == "":
         courier = answers.FINDCOURIER
+    if number == "":
+        number = answers.FINDCOURIER
 
     return answers.ORDERFORMAT.\
-        format(id=userid, name=courier, room=room, price=price, comment=comment)
+        format(id=userid, name=courier, number=number, room=room, price=price, comment=comment)
 
 def msg_orders(message : Message, bot : TeleBot, users, answers,\
                    markups):
@@ -31,7 +35,16 @@ def msg_orders(message : Message, bot : TeleBot, users, answers,\
     msg = answers.ORDERSMAIN
 
     for order in orders:
-        msg += form_order(answers=answers, userid=order[0], courier=order[4],
+        try:
+            user = users.getuser(order[3])
+            orders = users.getuserorders(message.chat.id)
+        except ValueError:
+            bot.send_message(message.chat.id, answers.BADREQUEST,
+                        reply_markup=markups.BASEMARKUP)
+            return
+        user = users.getuser(order[3])
+        number = user[1] if order[3] != -1 and user is not None else ""
+        msg += form_order(answers=answers, userid=order[0], courier=order[4], number=number,
                         room=order[5], price=order[6], comment=order[7])
 
     if orders == []:
@@ -39,6 +52,38 @@ def msg_orders(message : Message, bot : TeleBot, users, answers,\
 
     bot.send_message(message.chat.id, msg,
                     reply_markup=markups.ACTORDER, parse_mode="Markdown")
+
+def msg_courier_orders(message : Message, bot : TeleBot, users, answers,\
+                   markups, callbacks, id_ord):
+    """Formats orders message and send it"""
+
+    couriers = None
+    order = None
+    owner = None
+
+    try:
+        couriers = users.getfreecouriers()
+        order = users.getorder(id_ord)
+        owner = users.getuser(message.chat.id)
+    except ValueError:
+        bot.send_message(message.chat.id, answers.BADREQUEST,
+                    reply_markup=markups.BASEMARKUP)
+        return
+
+    msg = answers.NEWORDERCOURIER.\
+    format(id=id_ord, name=message.from_user.first_name, number=owner[1], \
+           room=order[5], price=order[6], comment=order[7])
+
+    btn = InlineKeyboardButton(answers.TAKEORDER, callback_data=\
+                               f"{callbacks.CALLBACKTAKEORDER}{id_ord}")
+    keyboard = InlineKeyboardMarkup().add(btn)
+
+    for courier in couriers:
+        try:
+            if courier[2] <= order[6] and courier[0] != message.chat.id:
+                bot.send_message(courier[0], msg, reply_markup=keyboard, parse_mode="Markdown")
+        except ApiTelegramException:
+            continue
 
 class Orders:
     """Orders handlers"""
@@ -81,15 +126,16 @@ class Orders:
         bot.send_message(message.chat.id, answers.UNCORRECTPRICE,
                         reply_markup=markups.EMPTYINL, parse_mode="Markdown")
 
-    def regorder(self, message : Message, bot : TeleBot, users, answers, markups):
+    def regorder(self, message : Message, bot : TeleBot, users, answers, markups, callbacks):
         """This function gets order comment and regs order"""
 
         comment = message.text
+        id_ord = None
 
         try:
             client = users.getuser(message.chat.id)
             with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-                users.addorder(client_id=message.chat.id,
+                id_ord = users.addorder(client_id=message.chat.id,
                                client_name=message.from_user.first_name,
                                room=client[2], price=data['ordprice'], comment=comment)
         except ValueError:
@@ -100,6 +146,8 @@ class Orders:
         bot.send_message(message.chat.id, answers.ORDERSUCCESS,
                         reply_markup=markups.EMPTYINL, parse_mode="Markdown")
         bot.delete_state(message.from_user.id, message.chat.id)
+
+        msg_courier_orders(message, bot, users, answers, markups, callbacks, id_ord)
 
         msg_orders(message, bot, users, answers, markups)
 

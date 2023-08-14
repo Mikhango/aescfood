@@ -27,6 +27,8 @@ class Callbacks:
     CALLBACKNEWORDER = 'neworder'
     CALLBACKDELORDER = 'delorder'
 
+    CALLBACKTAKEORDER = 'order-'
+
 class Buttons:
     """Buttons"""
 
@@ -45,6 +47,8 @@ class Buttons:
 
     NEWORDERBTN = "Создать заказ"
     DELORDERBTN = "Удалить заказ"
+
+    TAKEORDERBTN = "Взять заказ"
 
 
     MY_PROFILE = KeyboardButton(PROFILEBTN)
@@ -87,8 +91,10 @@ class Answers:
     COURIERMINPRICE = "Введи минимальную цену, от которой ты берешь заказы\nНе более 10000"
 
     ORDERSMAIN = "*Мои заказы*\n\n"
-    ORDERFORMAT = "*ID:* {id}\n*Имя курьера:* {name}\n*Комната для доставки:* {room}\n\
-*Цена:* {price}\n*Комментарий к заказу:* {comment}\n\n"
+    NEWORDERCOURIER = "*Новый заказ!*\n\n*ID:* {id}\n*Имя заказчика:* {name}\n*Номер заказчика:* \
+{number}\n*Комната для доставки:* {room}\n*Цена:* {price}\n*Комментарий к заказу:* {comment}\n\n"
+    ORDERFORMAT = "*ID:* {id}\n*Имя курьера:* {name}\n*Номер курьера:* {number}\n\
+*Комната для доставки:* {room}\n*Цена:* {price}\n*Комментарий к заказу:* {comment}\n\n"
     FINDCOURIER = "Ищем курьера"
     ORDERGETPRICE = "Введи цену, которую ты готов заплатить (за заказ, естественно)"
     ORDERGETCOMMENT = "Введи комментарий к заказу"
@@ -100,6 +106,7 @@ class Answers:
     COURIERORDERROR = "У заказа уже есть курьер. Для обсуждения \
 деталей заказа напишите ему в личные сообщения."
     BADORDER = "У вас нет такого заказа!"
+    TAKEORDER = "Взять заказ"
 
     BADREQUESTREG = "Ты уже зарегистрирован(-а)!"
     DOESNTREG = "Ты еще не зарегистрирован(-а)! Напиши мне /start, чтобы это исправить;)"
