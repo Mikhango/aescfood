@@ -2,10 +2,11 @@
 This file contains checkers and other help functions
 """
 
-class Checkers:
+class Helpers:
     """This class contains all checkers"""
-    def __init__(self):
-        pass
+
+    def __init__(self, users):
+        self.users = users
 
     def checknum(self, number : str):
         """This function checking number"""

@@ -6,54 +6,45 @@ from telebot import TeleBot
 from telebot.types import Message
 
 
-def start(message : Message, bot : TeleBot, users, ansmsg, checkers):
-    """This function answer on a /start command"""
+class Register:
+    """Class with register handlers"""
 
-    try:
-        users.adduser(message.chat.id)
-    except ValueError:
-        bot.send_message(message.chat.id, ansmsg['answers']['BADREQUESTREG'],
-                     reply_markup=ansmsg['markups']['BASEMARKUP'])
-        return
+    def start(self, message : Message, bot : TeleBot, answers, states):
+        """This function answer on a /start command"""
 
-    bot.send_message(message.chat.id, ansmsg['answers']['STARTMSG'])
-    bot.send_message(message.chat.id, ansmsg['answers']['TELEPHONE'])
-    bot.register_next_step_handler(message=message, callback=getnumber, bot=bot, users=users,
-                                   ansmsg = ansmsg, checkers=checkers)
+        bot.send_message(message.chat.id, answers.STARTMSG)
+        bot.send_message(message.chat.id, answers.TELEPHONE)
+        bot.set_state(message.from_user.id, states.regnumber, message.chat.id)
 
-def getnumber(message : Message, bot : TeleBot, users, ansmsg, checkers):
-    """This function gets number of user"""
+    def getnumber(self, message : Message, bot : TeleBot, answers, states):
+        """This function gets number of user"""
 
-    if not checkers.checknum(message.text):
-        bot.send_message(message.chat.id, ansmsg['answers']['PHONEWRONG'])
-        bot.register_next_step_handler(message=message, callback=getnumber, bot=bot,
-                                        users=users, ansmsg=ansmsg, checkers=checkers)
-        return
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+            data['numberu'] = message.text
 
-    try:
-        users.editusernumber(message.chat.id, message.text)
-    except ValueError:
-        bot.send_message(message.chat.id, ansmsg['answers']['BADREQUESTREG'])
-        return
+        bot.send_message(message.chat.id, answers.ROOM)
+        bot.set_state(message.from_user.id, states.regroom, message.chat.id)
 
-    bot.send_message(message.chat.id, ansmsg['answers']['ROOM'])
-    bot.register_next_step_handler(message=message, callback=getroom, bot=bot, users=users,
-                                   ansmsg=ansmsg, checkers=checkers)
+    def errorgetnumber(self, message : Message, bot : TeleBot, answers):
+        """Getting phone error"""
 
-def getroom(message : Message, bot : TeleBot, users, ansmsg, checkers):
-    """This function gets user's room number"""
+        bot.send_message(message.chat.id, answers.PHONEWRONG)
 
-    if not checkers.checkroom(message.text):
-        bot.send_message(message.chat.id, ansmsg['answers']['ROOMWRONG'])
-        bot.register_next_step_handler(message=message, callback=getroom, bot=bot,
-                                        users=users, ansmsg=ansmsg, checkers=checkers)
-        return
+    def getroom(self, message : Message, bot : TeleBot, users, answers, markups):
+        """This function gets user's room number"""
 
-    try:
-        users.edituserroom(message.chat.id, message.text)
-    except ValueError:
-        bot.send_message(message.chat.id, ansmsg['answers']['BADREQUESTREG'])
-        return
+        try:
+            with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+                users.adduser(message.chat.id, data['numberu'], message.text)
+        except ValueError:
+            bot.send_message(message.chat.id, answers.BADREQUESTREG)
+            return
 
-    bot.send_message(message.chat.id, ansmsg['answers']['ENDREG'],
-                     reply_markup=ansmsg['markups']['BASEMARKUP'])
+        bot.delete_state(message.from_user.id, message.chat.id)
+        bot.send_message(message.chat.id, answers.ENDREG,
+                        reply_markup=markups.BASEMARKUP)
+
+    def errorgetroom(self, message : Message, bot : TeleBot, answers):
+        """Getting room error"""
+
+        bot.send_message(message.chat.id, answers.ROOMWRONG)

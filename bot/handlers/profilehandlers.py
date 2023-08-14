@@ -6,82 +6,87 @@ from telebot import TeleBot
 from telebot.types import Message, CallbackQuery
 
 
-def myprofile(message : Message, bot : TeleBot, users, ansmsg):
-    """This function gets user profile"""
+def mainprofile(message : Message, bot : TeleBot, users, answers, markups):
+    """Main profile menu"""
 
     user = ()
 
     try:
         user = users.getuser(message.chat.id)
     except ValueError:
-        bot.send_message(message.chat.id, ansmsg['answers']['BADREQUEST'],
-                     reply_markup=ansmsg['markups']['BASEMARKUP'])
+        bot.send_message(message.chat.id, answers.BADREQUEST,
+                    reply_markup=markups.BASEMARKUP)
         return
 
-    bot.send_message(message.chat.id, ansmsg['answers']['PROFILE'].format(
+    bot.send_message(message.chat.id, answers.PROFILE.format(
         nick=message.from_user.first_name, number=user[1], room=user[2]),
-                     reply_markup=ansmsg['markups']['PROFILEMARKUP'], parse_mode='Markdown')
+                    reply_markup=markups.PROFILEMARKUP, parse_mode='Markdown')
 
-def changenumber(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg, checkers):
-    """This function allows user to change his number"""
+class Profile:
+    """Profile handlers"""
 
-    bot.edit_message_text(ansmsg['answers']['EDITNUMBER'],
-                          callback_data.from_user.id, callback_data.message.message_id,
-                          reply_markup=ansmsg['markups']['EMPTYINL'])
-    bot.register_next_step_handler(callback_data.message, enternumber, bot=bot,
-                                   users=users, ansmsg=ansmsg, checkers=checkers)
+    def myprofile(self, message : Message, bot : TeleBot, users, answers, markups):
+        """This function gets user profile"""
 
-def changeroom(callback_data: CallbackQuery, bot : TeleBot, users, ansmsg, checkers):
-    """This function allows user to change his room number"""
+        mainprofile(message, bot, users, answers, markups)
 
-    bot.edit_message_text(ansmsg['answers']['EDITROOM'],
-                          callback_data.from_user.id, callback_data.message.message_id,
-                          reply_markup=ansmsg['markups']['EMPTYINL'])
-    bot.register_next_step_handler(callback_data.message, enterroom, bot=bot,
-                                   users=users, ansmsg=ansmsg, checkers=checkers)
+    def changenumber(self, callback_data: CallbackQuery, bot : TeleBot, answers, markups, states):
+        """This function allows user to change his number"""
 
-def enterroom(message : Message, bot : TeleBot, users, ansmsg, checkers):
-    """This function edits user room"""
+        bot.edit_message_text(answers.EDITNUMBER,
+                            callback_data.from_user.id, callback_data.message.message_id,
+                            reply_markup=markups.EMPTYINL)
+        bot.set_state(callback_data.from_user.id, states.updnumber, callback_data.message.chat.id)
 
-    if not checkers.checkroom(message.text):
-        bot.send_message(message.chat.id, ansmsg['answers']['ROOMWRONG'],
-                     reply_markup=ansmsg['markups']['BASEMARKUP'])
-        return
 
-    user = ()
+    def changeroom(self, callback_data: CallbackQuery, bot : TeleBot, answers, markups, states):
+        """This function allows user to change his room number"""
 
-    try:
-        users.edituserroom(message.chat.id, message.text)
-        user = users.getuser(message.chat.id)
-    except ValueError:
-        bot.send_message(message.chat.id, ansmsg['answers']['BADREQUEST'],
-                     reply_markup=ansmsg['markups']['BASEMARKUP'])
-        return
-    bot.send_message(message.chat.id, ansmsg['answers']['PROFILEEDITED'],
-                     reply_markup=ansmsg['markups']['BASEMARKUP'])
-    bot.send_message(message.chat.id, ansmsg['answers']['PROFILE'].format(
-                    nick=message.from_user.first_name, number=user[1], room=user[2]),
-                     reply_markup=ansmsg['markups']['PROFILEMARKUP'], parse_mode='Markdown')
+        bot.edit_message_text(answers.EDITROOM,
+                            callback_data.from_user.id, callback_data.message.message_id,
+                            reply_markup=markups.EMPTYINL)
+        bot.set_state(callback_data.from_user.id, states.updroom, callback_data.message.chat.id)
 
-def enternumber(message : Message, bot : TeleBot, users, ansmsg, checkers):
-    """This function edits user number"""
+    def enterroom(self, message : Message, bot : TeleBot, users, answers, markups):
+        """This function edits user room"""
 
-    if not checkers.checknum(message.text):
-        bot.send_message(message.chat.id, ansmsg['answers']['PHONEWRONG'],
-                     reply_markup=ansmsg['markups']['BASEMARKUP'])
-        return
+        try:
+            users.edituserroom(message.chat.id, message.text)
+        except ValueError:
+            bot.send_message(message.chat.id, answers.BADREQUEST,
+                        reply_markup=markups.BASEMARKUP)
+            return
 
-    user = ()
+        bot.delete_state(message.from_user.id, message.chat.id)
+        bot.send_message(message.chat.id, answers.PROFILEEDITED,
+                        reply_markup=markups.BASEMARKUP)
+        mainprofile(message, bot, users, answers, markups)
 
-    try:
-        users.editusernumber(message.chat.id, message.text)
-        user = users.getuser(message.chat.id)
-    except ValueError:
-        bot.send_message(message.chat.id, ansmsg['answers']['BADREQUEST'],
-                     reply_markup=ansmsg['markups']['BASEMARKUP'])
-        return
-    bot.send_message(message.chat.id, ansmsg['answers']['PROFILEEDITED'],
-                     reply_markup=ansmsg['markups']['BASEMARKUP'])
-    bot.send_message(message.chat.id, ansmsg['answers']['PROFILE'].format(
-                    nick=message.from_user.first_name, number=user[1], room=user[2]),
-                     reply_markup=ansmsg['markups']['PROFILEMARKUP'], parse_mode='Markdown')
+    def errorupdroom(self, message : Message, bot : TeleBot, users, answers, markups):
+        """Updating room error"""
+
+        bot.send_message(message.chat.id, answers.ROOMWRONG)
+        bot.delete_state(message.from_user.id, message.chat.id)
+        mainprofile(message, bot, users, answers, markups)
+
+    def enternumber(self, message : Message, bot : TeleBot, users, answers, markups):
+        """This function edits user number"""
+
+        try:
+            users.editusernumber(message.chat.id, message.text)
+        except ValueError:
+            bot.send_message(message.chat.id, answers.BADREQUEST,
+                        reply_markup=markups.BASEMARKUP)
+            return
+
+        bot.delete_state(message.from_user.id, message.chat.id)
+        bot.send_message(message.chat.id, answers.PROFILEEDITED,
+                        reply_markup=markups.BASEMARKUP)
+        mainprofile(message, bot, users, answers, markups)
+
+    def errorupdnumber(self, message : Message, bot : TeleBot, users, answers, markups):
+        """Updating phone error"""
+
+        bot.send_message(message.chat.id, answers.PHONEWRONG)
+        bot.delete_state(message.from_user.id, message.chat.id)
+        mainprofile(message, bot, users, answers, markups)

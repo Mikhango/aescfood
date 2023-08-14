@@ -5,6 +5,10 @@ This file polls bot
 # Telebot
 from telebot import TeleBot
 
+# States
+from telebot.storage import StateMemoryStorage
+from telebot.custom_filters import StateFilter
+
 # DataBase
 from sqlitework import DataBase
 
@@ -18,13 +22,22 @@ from bot.register_handlers import register_handlers, register_callback_handlers
 from bot.middlewares.middlewareclasses import BotMiddleware
 
 # Answers
-from bot.answers import ansmsg
+from bot.answers import Answers, Markups
 
 # Helpfunctions
-from bot.helpfunctions import Checkers
+from bot.filters.filters import Helpers
+
+# States
+from bot.states.states import States
 
 
-bot = TeleBot(TOKEN, use_class_middlewares=True)
+# States memory
+state_storage = StateMemoryStorage()
+
+
+bot = TeleBot(TOKEN, use_class_middlewares=True, state_storage=state_storage)
+
+bot.add_custom_filter(StateFilter(bot))
 
 users = DataBase(__file__, "users")
 users.createtable("users", [["id", "INT"], ["number", "TEXT"], ["room", "TEXT"]])
@@ -34,10 +47,13 @@ users.createtable("orders", [["id", "INT"], ["id_client", "INT"], ["name_client"
                   ["id_courier", "INT"], ["name_courier", "TEXT"],
                   ["room", "TEXT"], ["price", "INT"], ["comment", "TEXT"]])
 
-register_handlers(bot=bot, users=users)
+helpers = Helpers(users)
+states = States()
+
+register_handlers(bot=bot, users=users, helpers=helpers, states=states)
 register_callback_handlers(bot=bot)
 
-bot.setup_middleware(BotMiddleware(users, ansmsg, Checkers()))
+bot.setup_middleware(BotMiddleware(users, Answers(), Markups(), helpers, states))
 
 if __name__ == '__main__':
     bot.polling(none_stop = True, interval = 0)
