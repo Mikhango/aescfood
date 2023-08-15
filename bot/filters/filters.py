@@ -21,6 +21,12 @@ class Helpers:
             return True
         return False
 
+    def checkcomment(self, room : str):
+        """This function checks number of room"""
+        if len(room) < 500 and room.count('\n') <= 5:
+            return True
+        return False
+
     def checkprice(self, price : int):
         """This function checks price of order"""
 

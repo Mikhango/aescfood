@@ -149,6 +149,11 @@ class Orders:
 
         msg_orders(message, bot, users, answers, markups)
 
+    def incorrectcomment(self, message : Message, bot : TeleBot, answers):
+        """If comment is incorrect"""
+
+        bot.send_message(message.chat.id, answers.INCORRECTCOMMENT, parse_mode="Markdown")
+
     def delorder(self, callback_data: CallbackQuery, bot : TeleBot,
                  users, answers, markups, states):
         """This function starts deleting order"""

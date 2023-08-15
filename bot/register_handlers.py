@@ -177,6 +177,10 @@ def register_orders_handlers(bot : TeleBot, helpers, states, users):
     bot.register_message_handler(callback=orders.incorrectordprice,
                                  state=states.getordprice,
                                  pass_bot=True)
+    bot.register_message_handler(callback=orders.incorrectcomment,
+                                 state=states.getordcomm,
+                                 func=lambda msg: not helpers.checkcomment(msg.text),
+                                 pass_bot=True)
     bot.register_message_handler(callback=orders.regorder,
                                  state=states.getordcomm,
                                  pass_bot=True)
