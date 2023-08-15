@@ -26,3 +26,4 @@ class States(StatesGroup):
 
     # Courier states
     courierprice = State()
+    courierdelord = State()

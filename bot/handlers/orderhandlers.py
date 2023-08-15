@@ -35,14 +35,13 @@ def msg_orders(message : Message, bot : TeleBot, users, answers,\
     msg = answers.ORDERSMAIN
 
     for order in orders:
+        user = None
         try:
             user = users.getuser(order[3])
-            orders = users.getuserorders(message.chat.id)
         except ValueError:
             bot.send_message(message.chat.id, answers.BADREQUEST,
                         reply_markup=markups.BASEMARKUP)
             return
-        user = users.getuser(order[3])
         number = user[1] if order[3] != -1 and user is not None else ""
         msg += form_order(answers=answers, userid=order[0], courier=order[4], number=number,
                         room=order[5], price=order[6], comment=order[7])
@@ -59,19 +58,17 @@ def msg_courier_orders(message : Message, bot : TeleBot, users, answers,\
 
     couriers = None
     order = None
-    owner = None
 
     try:
         couriers = users.getfreecouriers()
         order = users.getorder(id_ord)
-        owner = users.getuser(message.chat.id)
     except ValueError:
         bot.send_message(message.chat.id, answers.BADREQUEST,
                     reply_markup=markups.BASEMARKUP)
         return
 
     msg = answers.NEWORDERCOURIER.\
-    format(id=id_ord, name=message.from_user.first_name, number=owner[1], \
+    format(id=id_ord, name=message.from_user.first_name, \
            room=order[5], price=order[6], comment=order[7])
 
     btn = InlineKeyboardButton(answers.TAKEORDER, callback_data=\
@@ -93,6 +90,7 @@ class Orders:
         """This function gets current orders"""
 
         msg_orders(message, bot, users, answers, markups)
+        bot.delete_state(message.from_user.id, message.chat.id)
 
     def createorder(self, callback_data: CallbackQuery, bot : TeleBot, users, answers, \
                      markups, states):
@@ -169,7 +167,7 @@ class Orders:
         """This function gets id of deleting order and deletes it"""
 
         try:
-            users.delorder(int(message.text), message.chat.id)
+            users.delorder(int(message.text))
         except ValueError:
             bot.send_message(message.chat.id, answers.BADREQUEST,
                         reply_markup=markups.BASEMARKUP)

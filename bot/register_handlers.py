@@ -12,6 +12,7 @@ from bot.handlers.texthandler import bad_request
 from bot.handlers.profilehandlers import Profile
 from bot.handlers.careerhandlers import Career
 from bot.handlers.orderhandlers import Orders
+from bot.handlers.cancelaction import cancel_action
 
 
 register = Register()
@@ -31,11 +32,17 @@ def register_handlers(bot : TeleBot, users, helpers, states):
                                  func=lambda msg: not users.checkuser(msg.chat.id),
                                  pass_bot=True)
 
+    # Cancel action
+    bot.register_message_handler(callback=cancel_action,
+                                 state='*',
+                                 func=lambda msg: msg.text.lower() == "отмена",
+                                 pass_bot=True)
+
     # Profile
     register_profile_handlers(bot, helpers, states)
 
     # Courier
-    register_courier_handlers(bot, helpers, states)
+    register_courier_handlers(bot, helpers, states, users)
 
     # Orders
     register_orders_handlers(bot, helpers, states, users)
@@ -64,6 +71,14 @@ def register_reg_handlers(bot : TeleBot, helpers, states):
 def register_profile_handlers(bot : TeleBot, helpers, states):
     """Registers profile handlers"""
 
+    bot.register_callback_query_handler(callback=profile.changenumber,
+                                        func=lambda c: c.data == Callbacks.CALLBACKNUMBER,
+                                        pass_bot=True)
+    bot.register_callback_query_handler(callback=profile.changeroom,
+                                        func=lambda c: c.data == Callbacks.CALLBACKROOM,
+                                        pass_bot=True)
+
+
     bot.register_message_handler(callback=profile.myprofile,
                                  regexp=Buttons.PROFILEBTN, pass_bot=True)
     bot.register_message_handler(callback=profile.enterroom,
@@ -81,8 +96,29 @@ def register_profile_handlers(bot : TeleBot, helpers, states):
                                  state=states.updnumber,
                                  pass_bot=True)
 
-def register_courier_handlers(bot : TeleBot, helpers, states):
+def register_courier_handlers(bot : TeleBot, helpers, states, users):
     """Registers courier handlers"""
+
+    bot.register_callback_query_handler(callback=career.regcourier,
+                                        func=lambda c: c.data == Callbacks.CALLBACKCOURIERREG,
+                                        pass_bot=True)
+    bot.register_callback_query_handler(callback=career.editcourierstatus,
+                                        func=lambda c: c.data == Callbacks.CALLBACKCOURIERCHST,
+                                        pass_bot=True)
+    bot.register_callback_query_handler(callback=career.getcourierprice,
+                                        func=lambda c: c.data == Callbacks.CALLBACKCOURIERPRICE,
+                                        pass_bot=True)
+    bot.register_callback_query_handler(callback=career.orderscouriermain,
+                                        func=lambda c: c.data == Callbacks.CALLBACKCOURIERMYORD,
+                                        pass_bot=True)
+    bot.register_callback_query_handler(callback=career.takeorder,
+                                        func=lambda c: c.data.startswith\
+                                            (Callbacks.CALLBACKTAKEORDER),
+                                        pass_bot=True)
+    bot.register_callback_query_handler(callback=career.didordercourier,
+                                        func=lambda c: c.data == Callbacks.CALLBACKCOURIERDIDORD,
+                                        pass_bot=True)
+
 
     bot.register_message_handler(callback=career.couriermain,
                                  regexp=Buttons.COURIERBTN, pass_bot=True)
@@ -94,9 +130,26 @@ def register_courier_handlers(bot : TeleBot, helpers, states):
     bot.register_message_handler(callback=career.errorprice,
                                  state=states.courierprice,
                                  pass_bot=True)
+    bot.register_message_handler(callback=career.badcourierorder,
+                                 state=states.courierdelord,
+                                 func=lambda msg: not msg.text.isdigit() or not \
+                                    users.checkorderid(int(msg.text)) or not \
+                                    users.getorder(int(msg.text))[3] == msg.chat.id,
+                                 pass_bot=True)
+    bot.register_message_handler(callback=career.getiddidord,
+                                 state=states.courierdelord,
+                                 pass_bot=True)
 
 def register_orders_handlers(bot : TeleBot, helpers, states, users):
     """Registers orders handlers"""
+
+    bot.register_callback_query_handler(callback=orders.createorder,
+                                        func=lambda c: c.data == Callbacks.CALLBACKNEWORDER,
+                                        pass_bot=True)
+    bot.register_callback_query_handler(callback=orders.delorder,
+                                        func=lambda c: c.data == Callbacks.CALLBACKDELORDER,
+                                        pass_bot=True)
+
 
     bot.register_message_handler(callback=orders.ordersmain, regexp=Buttons.ORDERSBTN, \
                                  pass_bot=True)
@@ -111,42 +164,17 @@ def register_orders_handlers(bot : TeleBot, helpers, states, users):
     bot.register_message_handler(callback=orders.regorder,
                                  state=states.getordcomm,
                                  pass_bot=True)
+    bot.register_message_handler(callback=orders.badorder,
+                                 state=states.delord,
+                                 func=lambda msg: not msg.text.isdigit() or not \
+                                    users.checkorderid(int(msg.text)) or not \
+                                    users.checkuserorder(int(msg.text), msg.chat.id),
+                                 pass_bot=True)
     bot.register_message_handler(callback=orders.courierorderror,
                                  state=states.delord,
                                  func=lambda msg: msg.text.isdigit() and \
                                     users.checkordercourier(int(msg.text)),
                                  pass_bot=True)
-    bot.register_message_handler(callback=orders.badorder,
-                                 state=states.delord,
-                                 func=lambda msg: not msg.text.isdigit() or not \
-                                    users.checkuserorder(int(msg.text), msg.chat.id),
-                                 pass_bot=True)
     bot.register_message_handler(callback=orders.getdelordid,
                                  state=states.delord,
                                  pass_bot=True)
-
-def register_callback_handlers(bot : TeleBot):
-    """This function register all callback handlers in necessary order"""
-    bot.register_callback_query_handler(callback=profile.changenumber,
-                                        func=lambda c: c.data == Callbacks.CALLBACKNUMBER,
-                                        pass_bot=True)
-    bot.register_callback_query_handler(callback=profile.changeroom,
-                                        func=lambda c: c.data == Callbacks.CALLBACKROOM,
-                                        pass_bot=True)
-
-    bot.register_callback_query_handler(callback=career.regcourier,
-                                        func=lambda c: c.data == Callbacks.CALLBACKCOURIERREG,
-                                        pass_bot=True)
-    bot.register_callback_query_handler(callback=career.editcourierstatus,
-                                        func=lambda c: c.data == Callbacks.CALLBACKCOURIERCHST,
-                                        pass_bot=True)
-    bot.register_callback_query_handler(callback=career.getcourierprice,
-                                        func=lambda c: c.data == Callbacks.CALLBACKCOURIERPRICE,
-                                        pass_bot=True)
-
-    bot.register_callback_query_handler(callback=orders.createorder,
-                                        func=lambda c: c.data == Callbacks.CALLBACKNEWORDER,
-                                        pass_bot=True)
-    bot.register_callback_query_handler(callback=orders.delorder,
-                                        func=lambda c: c.data == Callbacks.CALLBACKDELORDER,
-                                        pass_bot=True)

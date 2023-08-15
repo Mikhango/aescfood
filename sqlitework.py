@@ -175,13 +175,15 @@ class DataBase:
     def editcouriermoney(self, userid : int, money : int) -> None:
         """This function edit courier minimal price"""
 
-        if not self.checkuser(userid):
+        if not self.checkcourier(userid):
             raise ValueError("This data is not exists")
+
+        curr = self.getcourier(userid)[3]
 
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
             cur.execute("""UPDATE couriers set earned=? where id=?""", \
-                        (money, userid))
+                        (money + curr, userid))
             con.commit()
 
     def checkorderid(self, idorder : int) -> bool:
@@ -196,7 +198,7 @@ class DataBase:
         return True
 
     def checkordercourier(self, idorder : int) -> bool:
-        """This function checks if given order id is exists"""
+        """This function checks if given order courier is exists"""
 
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
@@ -253,7 +255,7 @@ class DataBase:
 
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
-            cur.execute("""UPDATE couriers set id_courier=?, name_courier=? where id=?""", \
+            cur.execute("""UPDATE orders set id_courier=?, name_courier=? where id=?""", \
                         (courier_id, courier_name, orderid))
             con.commit()
 
@@ -264,14 +266,11 @@ class DataBase:
             return False
         return self.getorder(orderid)[1] == client_id
 
-    def delorder(self, orderid : int, client_id : int):
+    def delorder(self, orderid : int):
         """This function deletes order from orders table"""
 
         if not self.checkorderid(orderid):
             raise ValueError("Order is not exists")
-
-        if not self.checkuserorder(orderid, client_id):
-            raise ValueError("User is not creator")
 
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
@@ -284,6 +283,18 @@ class DataBase:
         with sqconnect(self.namedb) as con:
             cur = con.cursor()
             info = cur.execute("""SELECT * FROM orders WHERE id_client=?""", \
+                               (userid, ))
+            allinfo = info.fetchall()
+            if allinfo is None:
+                return []
+            return allinfo
+
+    def getcourierorders(self, userid : int) -> list:
+        """This function gets all orders of user"""
+
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            info = cur.execute("""SELECT * FROM orders WHERE id_courier=?""", \
                                (userid, ))
             allinfo = info.fetchall()
             if allinfo is None:

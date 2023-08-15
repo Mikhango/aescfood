@@ -28,6 +28,8 @@ class Callbacks:
     CALLBACKDELORDER = 'delorder'
 
     CALLBACKTAKEORDER = 'order-'
+    CALLBACKCOURIERDIDORD = 'courierorders'
+    CALLBACKCOURIERMYORD = 'couriermyord'
 
 class Buttons:
     """Buttons"""
@@ -49,6 +51,8 @@ class Buttons:
     DELORDERBTN = "Удалить заказ"
 
     TAKEORDERBTN = "Взять заказ"
+    COURIERDIDORDERBTN = "Выполнил заказ"
+    MYORDERSCOURIERBTN = "Взятые заказы"
 
 
     MY_PROFILE = KeyboardButton(PROFILEBTN)
@@ -65,6 +69,11 @@ class Buttons:
 
     NEWORDER = InlineKeyboardButton(NEWORDERBTN, callback_data=callbacks.CALLBACKNEWORDER)
     DELORDER = InlineKeyboardButton(DELORDERBTN, callback_data=callbacks.CALLBACKDELORDER)
+
+    COURIERDIDORDER = InlineKeyboardButton\
+        (COURIERDIDORDERBTN, callback_data=callbacks.CALLBACKCOURIERDIDORD)
+    MYORDERSCOURIER = InlineKeyboardButton\
+        (MYORDERSCOURIERBTN, callback_data=callbacks.CALLBACKCOURIERMYORD)
 
 class Answers:
     """Answers"""
@@ -91,16 +100,27 @@ class Answers:
     COURIERMINPRICE = "Введи минимальную цену, от которой ты берешь заказы\nНе более 10000"
 
     ORDERSMAIN = "*Мои заказы*\n\n"
-    NEWORDERCOURIER = "*Новый заказ!*\n\n*ID:* {id}\n*Имя заказчика:* {name}\n*Номер заказчика:* \
+    ORDERSTOOK = "*Взятые заказы*\n\n"
+    NEWORDERCOURIER = "*Новый заказ!*\n\n*ID:* {id}\n*Имя заказчика:* {name}\
+\n*Комната для доставки:* {room}\n*Цена:* {price}\n*Комментарий к заказу:* {comment}"
+    ORDERCOURIER = "*ID:* {id}\n*Имя заказчика:* {name}\n*Номер заказчика:* \
 {number}\n*Комната для доставки:* {room}\n*Цена:* {price}\n*Комментарий к заказу:* {comment}\n\n"
     ORDERFORMAT = "*ID:* {id}\n*Имя курьера:* {name}\n*Номер курьера:* {number}\n\
 *Комната для доставки:* {room}\n*Цена:* {price}\n*Комментарий к заказу:* {comment}\n\n"
+
+    TOOKORDERCOURIER = "Ты успешно взял(-а) заказ!"
+    TOOKORDERPUSH = "На твой заказ {id} найден курьер!"
+    ERRORTOOKORDER = "Заказ уже не актуален"
     FINDCOURIER = "Ищем курьера"
     ORDERGETPRICE = "Введи цену, которую ты готов заплатить (за заказ, естественно)"
     ORDERGETCOMMENT = "Введи комментарий к заказу"
     ORDERGETID = "Введи ID заказа, который хочешь удалить"
+    ORDERCOURIERGETID = "Введи ID заказа, который ты выполнил(-а)"
     ORDERSUCCESS = "Заказ успешно создан!"
     ORDERDELSUCCESS = "Заказ успешно удален!"
+    ORDERDIDSUCCESS = "Заказ отмечен как выполненный!"
+    ORDERDIDPUSH = "Курьер выполнил заказ номер {id}!"
+
     LIMITORDERS = "У вас не может быть > 2 заказов одновременно!"
     NOORDERS = "У вас нет текущих заказов"
     COURIERORDERROR = "У заказа уже есть курьер. Для обсуждения \
@@ -114,6 +134,8 @@ class Answers:
     PHONEWRONG = "Неправильный формат ввода!"
     ROOMWRONG = "Неправильный формат ввода!"
     UNCORRECTPRICE = "Неправильный формат цены!"
+
+    CANCELACTION = "Действие отменено"
 
 class Markups:
     """Markups"""
@@ -137,14 +159,17 @@ class Markups:
     COURIERBUSYMARKUP = InlineKeyboardMarkup(row_width=1)
     COURIERBUSYMARKUP.add(buttonformcourierstatus( \
         answers.COURIERBUSY, buttons.COURIERCHSTBTN, callbacks.CALLBACKCOURIERCHST), \
-                          buttons.CHANGECOURIERPRICE)
+                          buttons.CHANGECOURIERPRICE, buttons.MYORDERSCOURIER)
 
     COURIERFREEMARKUP = InlineKeyboardMarkup(row_width=1)
     COURIERFREEMARKUP.add(buttonformcourierstatus( \
         answers.COURIERFREE, buttons.COURIERCHSTBTN, callbacks.CALLBACKCOURIERCHST), \
-                          buttons.CHANGECOURIERPRICE)
+                          buttons.CHANGECOURIERPRICE, buttons.MYORDERSCOURIER)
 
     ACTORDER = InlineKeyboardMarkup(row_width=1)
     ACTORDER.add(buttons.NEWORDER, buttons.DELORDER)
+
+    MYORDERSCOURIER = InlineKeyboardMarkup(row_width=1)
+    MYORDERSCOURIER.add(buttons.COURIERDIDORDER)
 
     EMPTYINL = InlineKeyboardMarkup()

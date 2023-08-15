@@ -29,6 +29,7 @@ class Profile:
         """This function gets user profile"""
 
         mainprofile(message, bot, users, answers, markups)
+        bot.delete_state(message.from_user.id, message.chat.id)
 
     def changenumber(self, callback_data: CallbackQuery, bot : TeleBot, answers, markups, states):
         """This function allows user to change his number"""

@@ -16,7 +16,7 @@ from sqlitework import DataBase
 from bot.config import TOKEN
 
 # Register handlers
-from bot.register_handlers import register_handlers, register_callback_handlers
+from bot.register_handlers import register_handlers
 
 # Middleware class
 from bot.middlewares.middlewareclasses import BotMiddleware
@@ -51,7 +51,6 @@ helpers = Helpers(users)
 states = States()
 
 register_handlers(bot=bot, users=users, helpers=helpers, states=states)
-register_callback_handlers(bot=bot)
 
 bot.setup_middleware(BotMiddleware(users, Answers(), Markups(), Callbacks(), helpers, states))
 
