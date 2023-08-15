@@ -11,15 +11,15 @@ def getusersdb(message: Message, bot: TeleBot, users):
 
     allusers = users.getusers()
 
-    msg = ""
-
     for user in allusers:
+        msg = ''
         for param in user:
-            msg += str(param)
+            if len(str(param)) > 50:
+                msg += str(param)[:50]
+            else:
+                msg += str(param)
             msg += ' '
-        msg += '\n'
-
-    bot.send_message(message.chat.id, msg)
+        bot.send_message(message.chat.id, msg)
 
 def delusrdb(message: Message, bot: TeleBot, users):
     """This function gets all users in db"""
