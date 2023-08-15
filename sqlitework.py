@@ -26,6 +26,14 @@ class DataBase:
 
         return self.namedb
 
+    def getusers(self):
+        """This function gets all users"""
+
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            info = cur.execute("""SELECT * FROM users""")
+            return info.fetchall()
+
     def checkuser(self, userid : int) -> bool:
         """This function checks is user exists"""
 

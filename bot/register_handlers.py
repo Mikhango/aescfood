@@ -13,6 +13,7 @@ from bot.handlers.profilehandlers import Profile
 from bot.handlers.careerhandlers import Career
 from bot.handlers.orderhandlers import Orders
 from bot.handlers.cancelaction import cancel_action
+from bot.handlers.databasecommands import getusersdb, delusrdb
 
 
 register = Register()
@@ -23,6 +24,9 @@ orders = Orders()
 
 def register_handlers(bot : TeleBot, users, helpers, states):
     """This function register all handlers in necessary order"""
+
+    # Db for admins
+    register_db_handlers(bot, helpers)
 
     # Register
     register_reg_handlers(bot, helpers, states)
@@ -48,6 +52,18 @@ def register_handlers(bot : TeleBot, users, helpers, states):
     register_orders_handlers(bot, helpers, states, users)
 
     bot.register_message_handler(callback=bad_request, pass_bot=True)
+
+def register_db_handlers(bot : TeleBot, helpers):
+    """Registers db commands"""
+
+    bot.register_message_handler(callback=getusersdb,
+                                 commands=['getusers'],
+                                 func=lambda msg: helpers.checkpremission(int(msg.chat.id)),
+                                 pass_bot=True)
+    bot.register_message_handler(callback=delusrdb,
+                                 commands=['delusr'],
+                                 func=lambda msg: helpers.checkpremission(int(msg.chat.id)),
+                                 pass_bot=True)
 
 def register_reg_handlers(bot : TeleBot, helpers, states):
     """Registers registration handlers"""

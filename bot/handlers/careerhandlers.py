@@ -171,8 +171,9 @@ class Career:
         client_id = None
 
         if not users.checkorderid(order_id) or users.checkordercourier(order_id):
-            bot.send_message(callback_data.from_user.id, answers.ERRORTOOKORDER,
-                        reply_markup=markups.BASEMARKUP)
+            bot.edit_message_text(answers.ERRORTOOKORDER,
+                            callback_data.from_user.id, callback_data.message.message_id,
+                            reply_markup=markups.EMPTYINL)
             return
 
         try:
