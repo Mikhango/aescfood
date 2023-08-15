@@ -17,7 +17,7 @@ class Helpers:
 
     def checkroom(self, room : str):
         """This function checks number of room"""
-        if len(room) < 100:
+        if len(room) < 50 and room.count('*') == 0:
             return True
         return False
 
