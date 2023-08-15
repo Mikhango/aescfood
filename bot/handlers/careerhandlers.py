@@ -176,6 +176,8 @@ class Career:
                             reply_markup=markups.EMPTYINL)
             return
 
+        order = None
+
         try:
             users.addordercourier(order_id, chat_id, \
                                   callback_data.from_user.first_name)
@@ -189,7 +191,9 @@ class Career:
         bot.edit_message_text(answers.TOOKORDERCOURIER,
                             callback_data.from_user.id, callback_data.message.message_id,
                             reply_markup=markups.EMPTYINL)
-        bot.send_message(client_id, answers.TOOKORDERPUSH.format(id=order_id))
+        bot.send_message(client_id, answers.TOOKORDERPUSH.format(id=order_id, \
+                         name=callback_data.from_user.first_name, number=order[4]), \
+                            parse_mode="Markdown")
 
     def didordercourier(self, callback_data: CallbackQuery, bot : TeleBot,
                  users, answers, markups, states):
