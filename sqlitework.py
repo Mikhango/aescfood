@@ -122,6 +122,16 @@ class DataBase:
                 return False
         return True
 
+    def delcourier(self, userid : int) -> None:
+        """This function delete courier with given id"""
+
+        if not self.checkcourier(userid):
+            raise ValueError("This data is not exists")
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            cur.execute("""DELETE FROM couriers WHERE id=?;""", (userid,))
+            con.commit()
+
     def getcourier(self, userid : int) -> tuple:
         """This function gets one user with given id"""
 

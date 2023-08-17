@@ -177,12 +177,14 @@ class Career:
             return
 
         order = None
+        number_courier = None
 
         try:
             users.addordercourier(order_id, chat_id, \
                                   callback_data.from_user.first_name)
             order = users.getorder(order_id)
             client_id = order[1]
+            number_courier = users.getuser(chat_id)[1]
         except ValueError:
             bot.send_message(chat_id, answers.BADREQUEST,
                         reply_markup=markups.BASEMARKUP)
@@ -192,7 +194,7 @@ class Career:
                             callback_data.from_user.id, callback_data.message.message_id,
                             reply_markup=markups.EMPTYINL)
         bot.send_message(client_id, answers.TOOKORDERPUSH.format(id=order_id, \
-                         name=callback_data.from_user.first_name, number=order[4]), \
+                         name=callback_data.from_user.first_name, number=number_courier), \
                             parse_mode="Markdown")
 
     def didordercourier(self, callback_data: CallbackQuery, bot : TeleBot,
