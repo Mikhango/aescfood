@@ -37,3 +37,13 @@ def delusrdb(message: Message, bot: TeleBot, users):
         users.delcourier(usrid)
 
     bot.send_message(message.chat.id, "Deleted")
+
+def delorddb(message: Message, bot: TeleBot, users):
+    """This function deletes an order"""
+
+    ordid = int(message.text.split()[1])
+
+    if users.checkorderid(ordid):
+        users.delorder(ordid)
+
+    bot.send_message(message.chat.id, "Deleted")

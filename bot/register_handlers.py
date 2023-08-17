@@ -13,7 +13,7 @@ from bot.handlers.profilehandlers import Profile
 from bot.handlers.careerhandlers import Career
 from bot.handlers.orderhandlers import Orders
 from bot.handlers.cancelaction import cancel_action
-from bot.handlers.databasecommands import getusersdb, delusrdb
+from bot.handlers.databasecommands import getusersdb, delusrdb, delorddb
 
 
 register = Register()
@@ -62,6 +62,10 @@ def register_db_handlers(bot : TeleBot, helpers):
                                  pass_bot=True)
     bot.register_message_handler(callback=delusrdb,
                                  commands=['delusr'],
+                                 func=lambda msg: helpers.checkpremission(int(msg.chat.id)),
+                                 pass_bot=True)
+    bot.register_message_handler(callback=delorddb,
+                                 commands=['delord'],
                                  func=lambda msg: helpers.checkpremission(int(msg.chat.id)),
                                  pass_bot=True)
 
