@@ -318,3 +318,15 @@ class DataBase:
             if allinfo is None:
                 return []
             return allinfo
+
+    def getfreeorders(self) -> list:
+        """Gets all free orders"""
+
+        with sqconnect(self.namedb) as con:
+            cur = con.cursor()
+            info = cur.execute("""SELECT * FROM orders WHERE id_courier=?""", \
+                               (-1, ))
+            allinfo = info.fetchall()
+            if allinfo is None:
+                return []
+            return allinfo

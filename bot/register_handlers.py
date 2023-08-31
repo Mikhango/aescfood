@@ -138,6 +138,9 @@ def register_courier_handlers(bot : TeleBot, helpers, states, users):
     bot.register_callback_query_handler(callback=career.didordercourier,
                                         func=lambda c: c.data == Callbacks.CALLBACKCOURIERDIDORD,
                                         pass_bot=True)
+    bot.register_callback_query_handler(callback=career.allorders, \
+                                        func=lambda c: c.data == Callbacks.CALLBACKAORDERS,
+                                        pass_bot=True)
 
 
     bot.register_message_handler(callback=career.couriermain,

@@ -30,6 +30,7 @@ class Callbacks:
     CALLBACKTAKEORDER = 'order-'
     CALLBACKCOURIERDIDORD = 'courierorders'
     CALLBACKCOURIERMYORD = 'couriermyord'
+    CALLBACKAORDERS = 'allorders'
 
 class Buttons:
     """Buttons"""
@@ -53,6 +54,7 @@ class Buttons:
     TAKEORDERBTN = "Взять заказ 🛵"
     COURIERDIDORDERBTN = "Выполнил заказ ✅"
     MYORDERSCOURIERBTN = "Взятые заказы 🛵"
+    ALLORDERSBTN = "Все заказы 🛵"
 
 
     MY_PROFILE = KeyboardButton(PROFILEBTN)
@@ -74,11 +76,13 @@ class Buttons:
         (COURIERDIDORDERBTN, callback_data=callbacks.CALLBACKCOURIERDIDORD)
     MYORDERSCOURIER = InlineKeyboardButton\
         (MYORDERSCOURIERBTN, callback_data=callbacks.CALLBACKCOURIERMYORD)
+    ALLORDERS = InlineKeyboardButton(ALLORDERSBTN, callback_data=callbacks.CALLBACKAORDERS)
 
 class Answers:
     """Answers"""
 
-    STARTMSG = "Привет! 👋 Я - бот, созданный @MIKHAN_GO для помощи в доставке еды внутри СУНЦ МГУ.\n\
+    STARTMSG = "Привет! 👋 Я - бот, созданный @MIKHAN_GO для помощи в \
+доставке еды внутри СУНЦ МГУ.\n\
 Зарегистрируйся, и я расскажу, как это работает 😁"
     TELEPHONE = "Для начала отправь мне свой номер телефона в формате 8XXXXXXXXXX 📞"
     ROOM = "Отлично! Теперь отправь мне номер комнаты, в которой ты проживаешь 🏠"
@@ -103,6 +107,8 @@ class Answers:
     ORDERSTOOK = "🛵 *Взятые заказы*\n\n"
     NEWORDERCOURIER = "🎉 *Новый заказ!*\n\n👾 *ID:* {id}\n👤 *Имя заказчика:* {name}\
 \n🏠 *Комната для доставки:* {room}\n💰 *Цена:* {price}\n💬 *Комментарий к заказу:* {comment}"
+    OLDORDERCOURIER = "👾 *ID:* {id}\n👤 *Имя заказчика:* {name}\
+\n🏠 *Комната для доставки:* {room}\n💰 *Цена:* {price}\n💬 *Комментарий к заказу:* {comment}"
     ORDERCOURIER = "👾 *ID:* {id}\n👤 *Имя заказчика:* {name}\n📞 *Номер заказчика:* \
 {number}\n🏠 *Комната для доставки:* {room}\n💰 *Цена:* {price}\n💬 *Комментарий к заказу:* \
 {comment}\n\n"
@@ -122,6 +128,7 @@ class Answers:
     ORDERDELSUCCESS = "Заказ успешно удален! ✅"
     ORDERDIDSUCCESS = "Заказ отмечен как выполненный! ✅"
     ORDERDIDPUSH = "Курьер выполнил заказ номер {id}! 🎉"
+    NOORDERSACTIVE = "Сейчас нет активных заказов 😕"
 
     LIMITORDERS = "У вас не может быть > 2 заказов одновременно! ❌"
     NOORDERS = "У вас нет текущих заказов ❌"
@@ -162,12 +169,14 @@ class Markups:
     COURIERBUSYMARKUP = InlineKeyboardMarkup(row_width=1)
     COURIERBUSYMARKUP.add(buttonformcourierstatus( \
         answers.COURIERBUSY, buttons.COURIERCHSTBTN, callbacks.CALLBACKCOURIERCHST), \
-                          buttons.CHANGECOURIERPRICE, buttons.MYORDERSCOURIER)
+                          buttons.CHANGECOURIERPRICE, buttons.MYORDERSCOURIER, \
+                            buttons.ALLORDERS)
 
     COURIERFREEMARKUP = InlineKeyboardMarkup(row_width=1)
     COURIERFREEMARKUP.add(buttonformcourierstatus( \
         answers.COURIERFREE, buttons.COURIERCHSTBTN, callbacks.CALLBACKCOURIERCHST), \
-                          buttons.CHANGECOURIERPRICE, buttons.MYORDERSCOURIER)
+                          buttons.CHANGECOURIERPRICE, buttons.MYORDERSCOURIER, \
+                            buttons.ALLORDERS)
 
     ACTORDER = InlineKeyboardMarkup(row_width=1)
     ACTORDER.add(buttons.NEWORDER, buttons.DELORDER)

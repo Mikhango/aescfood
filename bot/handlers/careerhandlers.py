@@ -3,7 +3,8 @@ This file contains functions that take tare about career as a courier
 """
 
 from telebot import TeleBot
-from telebot.types import Message, CallbackQuery
+from telebot.types import Message, CallbackQuery, \
+InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def courier_profile_msg(answers, courier, name : str) -> str:
@@ -66,6 +67,31 @@ def orders_courier(message : Message, bot : TeleBot, users, answers, markups):
 
     bot.send_message(message.chat.id, msg,
                     reply_markup=markups.MYORDERSCOURIER, parse_mode="Markdown")
+
+def msg_courier_order(message : Message, bot : TeleBot, users, answers,\
+                   markups, callbacks, order):
+    """Formats order message"""
+
+    courier = None
+
+    try:
+        courier = users.getcouriers(message.chat.id)
+    except ValueError:
+        bot.send_message(message.chat.id, answers.BADREQUEST,
+                    reply_markup=markups.BASEMARKUP)
+        return
+
+    msg = answers.OLDORDERCOURIER.\
+    format(id=order[0], name=message.from_user.first_name, \
+           room=order[5], price=order[6], comment=order[7])
+
+    btn = InlineKeyboardButton(answers.TAKEORDER, callback_data=\
+                               f"{callbacks.CALLBACKTAKEORDER}{order[0]}")
+    keyboard = InlineKeyboardMarkup().add(btn)
+
+    if courier[2] <= order[6] and order[1] != message.chat.id:
+        bot.send_message(courier[0], msg, reply_markup=keyboard, parse_mode="Markdown")
+    return 1
 
 
 class Career:
@@ -239,3 +265,28 @@ class Career:
         bot.send_message(message.chat.id, answers.BADORDER, parse_mode="Markdown")
         bot.delete_state(message.from_user.id, message.chat.id)
         orders_courier(message, bot, users, answers, markups)
+
+    def allorders(self, callback_data: CallbackQuery, bot : TeleBot,
+                 users, answers, markups, callbacks):
+        """Courier can get all orders"""
+
+        if len(users.getcourierorders(callback_data.message.chat.id)) >= 2:
+            bot.send_message(callback_data.message.chat.id, \
+                             answers.LIMITORDERS, parse_mode="Markdown")
+            return
+
+        orders = None
+
+        try:
+            orders = users.getfreeorders()
+        except ValueError:
+            bot.send_message(callback_data.message.chat.id, answers.BADREQUEST,
+                        reply_markup=markups.BASEMARKUP)
+            return
+
+        if orders == []:
+            bot.send_message(callback_data.message.chat.id, answers.NOORDERSACTIVE)
+        else:
+            for order in orders:
+                msg_courier_order(callback_data.message, bot, users, answers,\
+                   markups, callbacks, order[0])
