@@ -68,28 +68,28 @@ def orders_courier(message : Message, bot : TeleBot, users, answers, markups):
     bot.send_message(message.chat.id, msg,
                     reply_markup=markups.MYORDERSCOURIER, parse_mode="Markdown")
 
-def msg_courier_order(message : Message, bot : TeleBot, users, answers,\
+def msg_courier_order(callback_data : Message, bot : TeleBot, users, answers,\
                    markups, callbacks, order):
     """Formats order message"""
 
     courier = None
 
     try:
-        courier = users.getcouriers(message.chat.id)
+        courier = users.getcourier(callback_data.message.chat.id)
     except ValueError:
-        bot.send_message(message.chat.id, answers.BADREQUEST,
+        bot.send_message(callback_data.message.chat.id, answers.BADREQUEST,
                     reply_markup=markups.BASEMARKUP)
         return
 
     msg = answers.OLDORDERCOURIER.\
-    format(id=order[0], name=message.from_user.first_name, \
+    format(id=order[0], name=order[2], \
            room=order[5], price=order[6], comment=order[7])
 
     btn = InlineKeyboardButton(answers.TAKEORDER, callback_data=\
                                f"{callbacks.CALLBACKTAKEORDER}{order[0]}")
     keyboard = InlineKeyboardMarkup().add(btn)
 
-    if courier[2] <= order[6] and order[1] != message.chat.id:
+    if courier[2] <= order[6] and order[1] != callback_data.message.chat.id:
         bot.send_message(courier[0], msg, reply_markup=keyboard, parse_mode="Markdown")
     return 1
 
@@ -288,5 +288,5 @@ class Career:
             bot.send_message(callback_data.message.chat.id, answers.NOORDERSACTIVE)
         else:
             for order in orders:
-                msg_courier_order(callback_data.message, bot, users, answers,\
-                   markups, callbacks, order[0])
+                msg_courier_order(callback_data, bot, users, answers,\
+                   markups, callbacks, order)

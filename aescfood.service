@@ -15,4 +15,4 @@ ExecStart=/usr/bin/python3 /home/code/aescfood/main.py
 ExecStop=kill $(cat /home/code/aescfood/service.pid)
 
 Restart=on-failure
-RestartSec=10s
+RestartSec=2s
